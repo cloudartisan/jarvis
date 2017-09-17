@@ -5,6 +5,7 @@ import sys
 import os.path
 
 import cv2
+import numpy
 
 import utils
 
@@ -42,41 +43,41 @@ class FaceDetector:
 
 class FaceRecogniser:
     def __init__(self):
-        self.subjects = {}
         self.face_detector = FaceDetector()
+        self.face_recogniser = cv2.face.LBPHFaceRecognizer_create()
+        self.subject_to_label = {}
 
     def train(self, training_data_path):
+        faces = []
+        labels = []
         #cv2.namedWindow('Training...', cv2.WND_PROP_FULLSCREEN)
         #cv2.setWindowProperty('Training...', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-        screen_width, screen_height = utils.get_screen_resolution()
-        window_width = int(screen_width * 0.8)
-        window_height = int(screen_height * 0.8)
+        #screen_width, screen_height = utils.get_screen_resolution()
+        #window_width = int(screen_width * 0.8)
+        #window_height = int(screen_height * 0.8)
         #cv2.namedWindow('Training...', cv2.WINDOW_NORMAL)
-        cv2.namedWindow('Training...')
         #cv2.resizeWindow('Training...', window_width, window_height)
+        cv2.namedWindow('Training...')
+        cv2.moveWindow('Training...', 0, 0)
 
         dirs = os.listdir(training_data_path)
+        print dirs
 
-        # Examine each directory prefixed with "subject"
-        # (e.g., subject1, subject2, ... subjectN)
+        label = 0
         for dir_name in dirs:
-            if not dir_name.startswith('subject'):
+            if dir_name.startswith('.'):
                 continue
-            subject_id = int(dir_name.replace('subject', ''))
+            subject = dir_name
+            print subject, label
             subject_path = os.path.join(training_data_path, dir_name)
             subject_image_files = os.listdir(subject_path)
-            self.subjects[subject_id] = {
-                'name' : None,
-                'data_path' : subject_path,
-                'image_files' : subject_image_files,
-                'faces' : [],
-            }
             # Read each image, detect the face, add the detected face to the
             # subject's list of faces
             for image_name in subject_image_files:
                 # Ignore system files like .DS_Store
                 if image_name.startswith('.') or image_name == 'name.txt':
-                    continue;
+                    continue
+                print image_name
                 image_path = os.path.join(subject_path, image_name)
                 image = cv2.imread(image_path)
 
@@ -93,12 +94,17 @@ class FaceRecogniser:
                     utils.draw_rectangle(small_image, small_rectangle_coordinates)
                     cv2.imshow('Training...', small_image)
                     cv2.waitKey(100)
-                    self.subjects[subject_id]['faces'].append(face)
+                    faces.append(face)
+                    labels.append(label)
+
+            label += 1
 
         # Clean up after ourselves
         cv2.destroyWindow('Training...')
         cv2.waitKey(1)
-        cv2.destroyWindow('Training...')
+        cv2.destroyAllWindows()
+
+        self.face_recogniser.train(faces, numpy.array(labels))
 
 
 def main():
