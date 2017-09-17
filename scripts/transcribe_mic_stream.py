@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Adapted from the original Google example:
+# https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/speech/cloud-client/transcribe_streaming_mic.py
+
 """
 This module requires the additional dependency `pyaudio`.
 
@@ -35,8 +38,6 @@ import sys
 from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
-
-from mic import MicrophoneStream
 
 # Audio recording parameters
 RATE = 16000
@@ -99,6 +100,14 @@ def listen_print_loop(responses):
 
 
 def main():
+    if __package__ is None:
+        import sys
+        from os import path
+        sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
+        from mic import MicrophoneStream
+    else:
+        from ..mic import MicrophoneStream
+
     # See http://g.co/cloud/speech/docs/languages
     # for a list of supported languages.
     language_code = 'en-US'  # a BCP-47 language tag
