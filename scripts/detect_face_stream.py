@@ -2,7 +2,7 @@ import cv2
 import sys
 
 
-face_cascade = cv2.CascadeClassifier('config/haarcascade_frontalface_default.xml')
+face_cascade = cv2.CascadeClassifier('cascades/haarcascade_frontalface_default.xml')
 video_capture = cv2.VideoCapture(0)
 
 while cv2.waitKey(1) & 0xFF != ord('q'):
