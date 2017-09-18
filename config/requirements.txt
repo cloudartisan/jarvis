@@ -4,3 +4,4 @@ google-cloud-speech==0.29.0
 nox-automation==0.17.0
 opencv-contrib-python==3.3.0.10
 pyaudio==0.2.11
+scipy==0.19.1
