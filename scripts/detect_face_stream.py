@@ -19,8 +19,8 @@ while cv2.waitKey(1) & 0xFF != ord('q'):
     # Annotate the frame with the number of faces found
     found = "Faces: {}".format(len(faces))
     font = cv2.FONT_HERSHEY_SIMPLEX
-    cv2.putText(frame, found, (50, 50), font, 1,(0, 0, 0), 2, cv2.LINE_AA)
-    cv2.putText(frame, "Type q to quit", (50, 100), font, 1,(0, 0, 0), 2, cv2.LINE_AA)
+    cv2.putText(frame, found, (50, 50), font, 1, (0, 0, 0), 2, cv2.LINE_AA)
+    cv2.putText(frame, "Type q to quit", (50, 100), font, 1, (0, 0, 0), 2, cv2.LINE_AA)
 
     # Draw a rectangle around the faces
     for (x, y, w, h) in faces:
