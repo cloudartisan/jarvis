@@ -5,13 +5,13 @@ import cv2
 
 import filters
 import rects
-from managers import WindowManager, CaptureManager
+from managers import TkinterWindowManager, WindowManager, CaptureManager
 from trackers import FaceTracker
 
 
 class JarvisVision(object):
     def __init__(self):
-        self._window_manager = WindowManager(
+        self._window_manager = TkinterWindowManager(
             'Jarvis', self.on_key_press)
         self._capture_manager = CaptureManager(
             cv2.VideoCapture(0), self._window_manager, True)

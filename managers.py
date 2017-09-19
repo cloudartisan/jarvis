@@ -1,6 +1,14 @@
+#!/usr/bin/env python
+
+import time
+
 import cv2
 import numpy
-import time
+
+from PIL import Image
+from PIL import ImageTk
+
+import Tkinter as tk
 
 
 class CaptureManager(object):
@@ -161,3 +169,69 @@ class WindowManager(object):
             # Discard any non-ASCII info encoded by GTK.
             keycode &= 0xFF
             self.key_press_callback(keycode)
+
+
+class TkinterWindowManager(WindowManager):
+    """
+    When holding a key down, multiple key press and key release events are fired in
+    succession. Debouncing is implemented in order to squash these repeated events
+    and know when the "real" KeyRelease and KeyPress events happen.
+    """
+    def __init__(self, window_name, key_press_callback=None):
+        self._has_prev_key_release = None
+        super(TkinterWindowManager, self).__init__(window_name, key_press_callback)
+
+    def create_window(self):
+        self.root = tk.Tk()
+        self.panel = None
+        self.root.wm_title(self._window_name)
+        self.root.wm_protocol('WM_DELETE_WINDOW', self.destroy_window)
+        self._is_window_created = True
+
+    def show(self, frame):
+        # OpenCV represents images in BGR order; however PIL
+        # represents images in RGB order, so we need to swap
+        # the channels, then convert to PIL and ImageTk format
+        image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        image = Image.fromarray(image)
+        image = ImageTk.PhotoImage(image)
+
+        # if the panel is not None, we need to initialize it
+        if self.panel is None:
+            self.panel = tk.Label(image=image)
+            self.panel.image = image
+            self.panel.bind('<KeyRelease>', self._on_key_release_repeat)
+            self.panel.bind('<KeyPress>', self._on_key_press_repeat)
+            self.panel.pack(side='left', padx=10, pady=10)
+            self.panel.focus_set()
+        # otherwise, simply update the panel
+        else:
+            self.panel.configure(image=image)
+            self.panel.image = image
+
+        self.root.update()
+
+    def _on_key_release(self, event):
+        self._has_prev_key_release = None
+        print '_on_key_release', repr(event.char), ord(event.char)
+        if self.key_press_callback is not None:
+            self.key_press_callback(ord(event.char))
+
+    def _on_key_press(self, event):
+        print '_on_key_press', repr(event.char)
+
+    def _on_key_release_repeat(self, event):
+        self._has_prev_key_release = self.root.after_idle(self._on_key_release, event)
+        print '_on_key_release_repeat', repr(event.char)
+
+    def _on_key_press_repeat(self, event):
+        if self._has_prev_key_release:
+            self.root.after_cancel(self._has_prev_key_release)
+            self._has_prev_key_release = None
+            print '_on_key_press_repeat', repr(event.char)
+        else:
+            self._on_key_press(event)
+
+    def destroy_window(self):
+        self.root.quit()
+        self._is_window_created = False
