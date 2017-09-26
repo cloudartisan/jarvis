@@ -1,3 +1,4 @@
 env
 training/data/
 *.pyc
+screenshot.png
