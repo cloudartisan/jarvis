@@ -105,6 +105,17 @@ class FaceTracker(object):
         sub_x, sub_y, sub_w, sub_h = sub_rects[0]
         return (x+sub_x, y+sub_y, sub_w, sub_h)
 
+    def draw_debug_text(self, image):
+        """Draw text indicating the number of detected faces."""
+        if utils.is_gray(image):
+            text_colour = 255
+        else:
+            text_colour = (255, 255, 255)
+
+        found = "Faces: {}".format(len(self.faces))
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(image, found, (50, 50), font, 1, (0, 0, 0), 2, cv2.LINE_AA)
+
     def draw_debug_rects(self, image):
         """Draw rectangles around the tracked facial features."""
         if utils.is_gray(image):
