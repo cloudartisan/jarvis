@@ -190,3 +190,13 @@ The application features a control panel with:
 5. View both streams simultaneously by opening these URLs in a browser:
    - Raw stream: http://localhost:8000/
    - Filtered stream: http://localhost:8888/
+
+## Future Development
+
+The project has several planned enhancements for future development:
+
+- **Facial Identification**: Recognise specific individuals beyond just detection
+- **Emotion Detection**: Analyse facial expressions and voice patterns to detect emotions
+- **Voice Commands**: Control the application using speech via mic.py integration
+- **Advanced Object Detection**: Identify and track multiple object types
+- **Remote Control**: Web interface for controlling the application remotely
