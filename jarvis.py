@@ -12,6 +12,7 @@ from managers import ThreadedCaptureManager
 from qt_managers import PyQtWindowManager
 from trackers import FaceTracker
 from streams import DummyStream, WebcamVideoStream, ThreadedWebStream
+from face_detection import Face
 
 
 class Jarvis(object):
