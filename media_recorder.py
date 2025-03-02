@@ -164,18 +164,5 @@ class VideoRecorder(Thread):
         self._video_writer.write(frame)
 
 
-# For backward compatibility
-class MediaRecorder(VideoRecorder):
-    """Alias for VideoRecorder for backward compatibility."""
-    
-    def write_image(self, filename):
-        """Legacy method, use capture_screenshot instead."""
-        return self.capture_screenshot(filename)
-        
-    def start_writing_video(self, filename, encoding=cv2.VideoWriter_fourcc(*'MJPG')):
-        """Legacy method, use start_recording instead."""
-        return self.start_recording(filename, encoding)
-        
-    def stop_writing_video(self):
-        """Legacy method, use stop_recording instead."""
-        return self.stop_recording()
+# Note: The MediaRecorder compatibility class has been removed
+# All code should now use VideoRecorder directly

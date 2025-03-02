@@ -1,39 +1,21 @@
 #!/usr/bin/env python3
 
 """
-DEPRECATED: This module is kept for backward compatibility only.
+DEPRECATED MODULE: This file exists for backward compatibility.
 
 The functionality has been moved to more appropriately named modules:
-- ThreadedCaptureManager -> MediaRecorder in streams.py
-- Window managers -> PyQtWindowManager in video_ui.py 
+- Video recording -> VideoRecorder in media_recorder.py
+- UI/Window management -> PyQtWindowManager in video_ui.py 
 - Web streaming -> ThreadedWebStream in streams.py
 
-Please update your imports to use the new modules directly.
+This module is empty and may be removed in future releases.
 """
 
 import warnings
-import logging
-from media_recorder import MediaRecorder, VideoRecorder
 
 # Show deprecation warning
 warnings.warn(
-    "The managers module is deprecated. Please use media_recorder.VideoRecorder, "
+    "The managers module is deprecated and empty. Please use media_recorder.VideoRecorder, "
     "video_ui.PyQtWindowManager, and streams.ThreadedWebStream instead.",
     DeprecationWarning, stacklevel=2
 )
-
-# For backward compatibility
-class ThreadedCaptureManager(MediaRecorder):
-    """
-    DEPRECATED: Use VideoRecorder from media_recorder.py instead.
-    
-    This class is kept for backward compatibility only.
-    """
-    def __init__(self, capture, should_mirror_capture=False, 
-                 preview_manager=None, should_mirror_preview=False):
-        """Initialize with backward compatible parameters."""
-        logging.warning("ThreadedCaptureManager is deprecated. Use VideoRecorder from media_recorder.py instead.")
-        super(ThreadedCaptureManager, self).__init__(
-            capture=capture,
-            should_mirror_preview=should_mirror_preview
-        )
