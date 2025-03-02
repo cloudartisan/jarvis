@@ -4,7 +4,7 @@ import logging
 import sys
 import cv2
 import numpy as np
-import colours
+from jarvis.utils import colours
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap, QPainter, QColor, QFont
 from PyQt5.QtWidgets import (
@@ -226,35 +226,35 @@ class PyQtWindowManager(QMainWindow):
         emboss_filter_action.triggered.connect(lambda: self._select_filter_from_menu('emboss'))
         filters_menu.addAction(emboss_filter_action)
         
-        # Separator for color filters
+        # Separator for colour filters
         filters_menu.addSeparator()
         
-        # Color filters submenu
-        color_filters_menu = filters_menu.addMenu('Color Filters')
+        # Colour filters submenu
+        colour_filters_menu = filters_menu.addMenu('Colour Filters')
         
         # Cross Process action
         cross_filter_action = QAction('Cross Process', self)
         cross_filter_action.setData('cross_process')
         cross_filter_action.triggered.connect(lambda: self._select_filter_from_menu('cross_process'))
-        color_filters_menu.addAction(cross_filter_action)
+        colour_filters_menu.addAction(cross_filter_action)
         
         # Portra action
         portra_filter_action = QAction('Portra', self)
         portra_filter_action.setData('portra')
         portra_filter_action.triggered.connect(lambda: self._select_filter_from_menu('portra'))
-        color_filters_menu.addAction(portra_filter_action)
+        colour_filters_menu.addAction(portra_filter_action)
         
         # Provia action
         provia_filter_action = QAction('Provia', self)
         provia_filter_action.setData('provia')
         provia_filter_action.triggered.connect(lambda: self._select_filter_from_menu('provia'))
-        color_filters_menu.addAction(provia_filter_action)
+        colour_filters_menu.addAction(provia_filter_action)
         
         # Velvia action
         velvia_filter_action = QAction('Velvia', self)
         velvia_filter_action.setData('velvia')
         velvia_filter_action.triggered.connect(lambda: self._select_filter_from_menu('velvia'))
-        color_filters_menu.addAction(velvia_filter_action)
+        colour_filters_menu.addAction(velvia_filter_action)
     
     def _create_toolbar(self):
         """Create the toolbar."""

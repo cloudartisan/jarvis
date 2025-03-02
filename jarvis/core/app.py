@@ -6,13 +6,13 @@ from threading import Thread
 
 import cv2
 
-import filters
-import rects
-from video_ui import PyQtWindowManager
-from face_detector import FaceDetector
-from streams import DummyStream, WebcamVideoStream, ThreadedWebStream
-from video_recorder import VideoRecorder
-from face_detection import Face
+from jarvis.utils import filters
+from jarvis.utils import rects
+from jarvis.ui.display import PyQtWindowManager
+from jarvis.face.detector import FaceDetector
+from jarvis.video.streams import DummyStream, WebcamVideoStream, ThreadedWebStream
+from jarvis.video.recorder import VideoRecorder
+from jarvis.face.base import Face
 
 
 class Jarvis(object):
@@ -379,7 +379,7 @@ class Jarvis(object):
             return
             
         # Import colours here to avoid circular imports
-        import colours
+        from jarvis.utils import colours
         
         # Draw debug overlay
         for face in self._smoothed_faces:

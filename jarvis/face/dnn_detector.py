@@ -1,4 +1,4 @@
-#\!/usr/bin/env python3
+#!/usr/bin/env python3
 
 import cv2
 import numpy as np
@@ -22,12 +22,16 @@ class DNNFaceDetector(BaseFaceDetector):
         super().__init__(**kwargs)
         self.min_confidence = min_confidence
         
-        # Check if we have the required model files
-        model_file = "models/opencv_face_detector_uint8.pb"
-        config_file = "models/opencv_face_detector.pbtxt"
+        # Get the base directory of the project
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        models_dir = os.path.join(base_dir, "models")
         
-        if not os.path.exists("models"):
-            os.makedirs("models")
+        # Check if we have the required model files
+        model_file = os.path.join(models_dir, "opencv_face_detector_uint8.pb")
+        config_file = os.path.join(models_dir, "opencv_face_detector.pbtxt")
+        
+        if not os.path.exists(models_dir):
+            os.makedirs(models_dir)
         
         # Download model files if they don't exist
         if not os.path.exists(model_file) or not os.path.exists(config_file):
@@ -41,8 +45,8 @@ class DNNFaceDetector(BaseFaceDetector):
         """Download the required model files if they don't exist"""
         import urllib.request
         
-        # Create models directory if it doesn't exist
-        os.makedirs("models", exist_ok=True)
+        # Ensure models directory exists
+        os.makedirs(os.path.dirname(model_file), exist_ok=True)
         
         # URLs for the model files - updated to working links
         model_url = "https://raw.githubusercontent.com/opencv/opencv_3rdparty/dnn_samples_face_detector_20180220_uint8/opencv_face_detector_uint8.pb"
@@ -54,7 +58,7 @@ class DNNFaceDetector(BaseFaceDetector):
         print(f"Downloading config file from {config_url}")
         urllib.request.urlretrieve(config_url, config_file)
         
-        print("Download complete\!")
+        print("Download complete!")
     
     def detect_faces(self, image):
         """

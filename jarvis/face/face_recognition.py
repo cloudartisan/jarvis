@@ -1,9 +1,9 @@
-#\!/usr/bin/env python3
+#!/usr/bin/env python3
 
 import os
 import cv2
 import numpy as np
-import utils
+from jarvis.utils import helpers as utils
 from .haar_detector import HaarFaceDetector
 
 class FaceRecognizer:
@@ -110,7 +110,7 @@ class FaceRecognizer:
             print(f"Training with {len(faces)} faces")
             self.face_recognizer.train(faces, np.array(labels))
             self.is_trained = True
-            print("Training complete\!")
+            print("Training complete!")
         else:
             print("No faces found for training")
     

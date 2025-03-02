@@ -164,27 +164,46 @@ The application features a control panel with:
 
 ## Project Structure
 
-- `jarvis.py` - Main application file
-- `video_ui.py` - PyQt5 UI components and window management
-- `face_detector.py` - Face and feature detection and tracking
-- `streams.py` - Video stream abstractions and web streaming
-- `video_recorder.py` - Video recording and screenshot functionality
-- `utils.py` - Helper functions
-- `rects.py` - Rectangle handling functions
-- `colours.py` - Colour constants for visual elements
-- `filters.py` - Image processing filters and effects
-- `face_detection/` - Package for different detection algorithms
-  - `base.py` - Base classes for detection
-  - `dnn_detector.py` - Deep neural network detector
-  - `haar_detector.py` - Haar cascade detector
-  - `face_recognition.py` - Face feature recognition
-- `cascades/` - OpenCV face detection XML files
-- `scripts/` - Utility scripts for face detection, web streaming, and speech transcription
-- `managers.py` - Deprecated module (functionality moved to other modules)
+The project is now organized as a Python package with logical modules:
+
+```
+jarvis/
+├── __init__.py          # Package initialization and entry point
+├── core/                # Core application functionality
+│   ├── __init__.py
+│   └── app.py           # Main Jarvis application class
+├── face/                # Face detection functionality
+│   ├── __init__.py
+│   ├── base.py          # Base face detector class
+│   ├── cascades/        # Haar cascade XML files
+│   ├── detector.py      # Main face detector implementation
+│   ├── dnn_detector.py  # Deep neural network detector
+│   ├── face_recognition.py  # Face class and recognition functions
+│   └── haar_detector.py # Haar cascade detector
+├── ui/                  # User interface components
+│   ├── __init__.py
+│   └── display.py       # PyQt5 UI components
+├── utils/               # Utility functions and helpers
+│   ├── __init__.py
+│   ├── colours.py       # Colour constants
+│   ├── filters.py       # Image processing filters
+│   ├── helpers.py       # General helper functions
+│   └── rects.py         # Rectangle handling utilities
+├── video/               # Video handling capabilities
+│   ├── __init__.py
+│   ├── recorder.py      # Video recording functionality
+│   └── streams.py       # Video stream implementations
+└── audio/               # Audio processing (for future voice features)
+    ├── __init__.py
+    └── microphone.py    # Microphone handling
+```
+
+- `scripts/` - Utility scripts for face detection, web streaming, and speech recognition
+- `run_jarvis.py` - Simple script to launch the application
 
 ## Using the Image Filters
 
-1. Run the main application: `python jarvis.py`
+1. Run the main application: `python run_jarvis.py`
 2. Select a filter from the dropdown menu or Filters menu
 3. Adjust the intensity using the slider
 4. Toggle "Show Filtered Stream" to view the filtered video in the main window

@@ -1,4 +1,4 @@
-#\!/usr/bin/env python3
+#!/usr/bin/env python3
 
 import cv2
 import numpy as np
@@ -28,9 +28,13 @@ class HaarFaceDetector(BaseFaceDetector):
         self.scale_factor = scale_factor
         self.min_neighbors = min_neighbors
         
+        # Get the correct path to cascade files
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        cascade_dir = os.path.join(base_dir, 'cascades')
+        
         # Use the default classifier if none provided
         if classifier_file is None:
-            self.classifier_file = 'cascades/haarcascade_frontalface_default.xml'
+            self.classifier_file = os.path.join(cascade_dir, 'haarcascade_frontalface_default.xml')
         else:
             self.classifier_file = classifier_file
             

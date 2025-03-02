@@ -5,12 +5,12 @@ import cv2
 import numpy
 
 
-def outline_rect(image, rect, color):
+def outline_rect(image, rect, colour):
     """Draw a rectangle around a region of interest in an image."""
     if rect is None:
         return
     x, y, w, h = rect
-    cv2.rectangle(image, (x, y), (x+w, y+h), color, 1)
+    cv2.rectangle(image, (x, y), (x+w, y+h), colour, 1)
 
 
 def copy_rect(src, dst, src_rect, dst_rect,

@@ -2,10 +2,12 @@
 
 
 import cv2
-import rects
-import utils
-import colours
-from face_detection import Face, DNNFaceDetector, HaarFaceDetector
+from jarvis.utils import rects
+from jarvis.utils import helpers as utils
+from jarvis.utils import colours
+from jarvis.face.base import Face
+from jarvis.face.dnn_detector import DNNFaceDetector
+from jarvis.face.haar_detector import HaarFaceDetector
 
 
 class FaceDetector:
@@ -27,18 +29,23 @@ class FaceDetector:
             print("Falling back to Haar cascade detectors")
             self._use_dnn = False
         
+        # Get the correct path to cascade files
+        import os
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        cascade_dir = os.path.join(base_dir, 'cascades')
+        
         # Keep Haar cascade detectors as fallback
         self._face_classifier_alt = cv2.CascadeClassifier(
-            'cascades/haarcascade_frontalface_alt.xml')
+            os.path.join(cascade_dir, 'haarcascade_frontalface_alt.xml'))
         self._face_classifier_default = cv2.CascadeClassifier(
-            'cascades/haarcascade_frontalface_default.xml')
+            os.path.join(cascade_dir, 'haarcascade_frontalface_default.xml'))
         
         self._eye_classifier = cv2.CascadeClassifier(
-            'cascades/haarcascade_eye.xml')
+            os.path.join(cascade_dir, 'haarcascade_eye.xml'))
         self._nose_classifier = cv2.CascadeClassifier(
-            'cascades/haarcascade_mcs_nose.xml')
+            os.path.join(cascade_dir, 'haarcascade_mcs_nose.xml'))
         self._mouth_classifier = cv2.CascadeClassifier(
-            'cascades/haarcascade_mcs_mouth.xml')
+            os.path.join(cascade_dir, 'haarcascade_mcs_mouth.xml'))
 
     @property
     def faces(self):
@@ -118,17 +125,17 @@ class FaceDetector:
         # Prepare the image for detection
         if utils.is_gray(image):
             gray = cv2.equalizeHist(image)
-            # We need a color version for DNN-based detection
-            color_image = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+            # We need a colour version for DNN-based detection
+            colour_image = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
         else:
-            color_image = image  # Keep original for DNN
+            colour_image = image  # Keep original for DNN
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             cv2.equalizeHist(gray, gray)
 
         # Try DNN detector first if available (more accurate)
         if hasattr(self, '_use_dnn') and self._use_dnn:
             try:
-                face_rects = self._dnn_detector.detect_faces(color_image)
+                face_rects = self._dnn_detector.detect_faces(colour_image)
                 # If no faces found with DNN, fall back to Haar cascades
                 if len(face_rects) == 0:
                     face_rects = self._detect_faces_with_haar(gray)

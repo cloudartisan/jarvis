@@ -3,7 +3,7 @@
 
 import cv2
 import numpy
-import utils
+from jarvis.utils import helpers as utils
 
 
 def stroke_edges(src, dst, blur_k_size = 7, edges_k_size = 5):
