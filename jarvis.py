@@ -24,8 +24,16 @@ class Jarvis(object):
         self.processed_web_stream = ThreadedWebStream(self.processed_camera_stream, port=8888)
         self.face_detector = FaceDetector()
         self.window_manager = PyQtWindowManager('Jarvis - Computer Vision', self.on_key_press)
+        self.window_manager.filterChanged.connect(self.on_filter_changed)
+        self.window_manager.showFilteredChanged.connect(self.on_show_filtered_changed)
         self.capture_manager = ThreadedCaptureManager(self.raw_camera_stream,
                 False, None, False)
+        
+        # Initialize filters
+        self.current_filter = None
+        self.filter_intensity = 50
+        self.show_filtered_view = False
+        self._initialize_filters()
 
     def start(self):
         logging.info('Starting raw camera stream')
@@ -239,11 +247,30 @@ class Jarvis(object):
                     # Update the debug state in the UI
                     self.window_manager.video_display.set_debug_mode(self._should_draw_debug)
                     
-                    # Update the processed stream
-                    self.processed_camera_stream.frame = frame
+                    # Apply filter to create processed frame if needed
+                    if self.current_filter and self.current_filter != 'none':
+                        # Create a copy of the frame for processing
+                        processed_frame = frame.copy()
+                        
+                        # Apply the selected filter
+                        self.apply_filter(processed_frame, processed_frame)
+                        
+                        # Update the processed stream with the filtered frame
+                        self.processed_camera_stream.frame = processed_frame
+                    else:
+                        # No filter, use raw frame
+                        self.processed_camera_stream.frame = frame
                     
-                    # Send the raw frame to the UI for display
-                    self.window_manager.show_frame(frame)
+                    # Decide which frame to show in the UI
+                    if self.show_filtered_view and self.current_filter and self.current_filter != 'none':
+                        # Show the filtered frame in the UI
+                        display_frame = self.processed_camera_stream.frame
+                    else:
+                        # Show the raw frame in the UI
+                        display_frame = frame
+                        
+                    # Send the selected frame to the UI for display
+                    self.window_manager.show_frame(display_frame)
                 self.window_manager.process_events()
         finally:
             self.stop()
@@ -294,6 +321,59 @@ class Jarvis(object):
         self.window_manager.detection_action.blockSignals(False)
         self.window_manager.show_detection_cb.blockSignals(False)
 
+    def _initialize_filters(self):
+        """Initialize the image filters."""
+        # Create filter instances
+        self.filters = {
+            'none': None,
+            'edges': filters.FindEdgesFilter(),
+            'sharpen': filters.SharpenFilter(),
+            'blur': filters.BlurFilter(),
+            'emboss': filters.EmbossFilter(),
+            'cross_process': filters.BGRCrossProcessCurveFilter(),
+            'portra': filters.BGRPortraCurveFilter(),
+            'provia': filters.BGRProviaCurveFilter(),
+            'velvia': filters.BGRVelviaCurveFilter()
+        }
+    
+    def apply_filter(self, src, dst):
+        """Apply the currently selected filter to the frame."""
+        if not self.current_filter or self.current_filter == 'none' or self.current_filter not in self.filters:
+            # No filtering needed, just copy
+            if src is not dst:
+                dst[:] = src
+            return
+        
+        filter_obj = self.filters[self.current_filter]
+        
+        # Special case for edges - use stroke_edges function instead of FindEdgesFilter
+        if self.current_filter == 'edges':
+            # For edge detection, we can adjust parameters based on intensity
+            blur_size = max(3, 3 + (self.filter_intensity // 10) * 2)  # Odd values 3-13
+            edge_size = max(3, 3 + (self.filter_intensity // 20) * 2)  # Odd values 3-7
+            
+            # Ensure odd values
+            if blur_size % 2 == 0:
+                blur_size += 1
+            if edge_size % 2 == 0:
+                edge_size += 1
+                
+            filters.stroke_edges(src, dst, blur_size, edge_size)
+        else:
+            # Apply the filter - convolution or curve filter
+            filter_obj.apply(src, dst)
+            
+    def on_filter_changed(self, filter_id, intensity):
+        """Handle filter change from UI."""
+        logging.info(f"Filter changed to {filter_id} with intensity {intensity}")
+        self.current_filter = filter_id
+        self.filter_intensity = intensity
+        
+    def on_show_filtered_changed(self, show_filtered):
+        """Handle change in whether to show filtered stream."""
+        logging.info(f"Show filtered view changed to {show_filtered}")
+        self.show_filtered_view = show_filtered
+    
     def on_key_press(self, keycode):
         """Handle a key press.
 

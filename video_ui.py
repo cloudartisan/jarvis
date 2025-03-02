@@ -104,6 +104,8 @@ class PyQtWindowManager(QMainWindow):
     """Main application window and video display for Jarvis."""
     
     keyPressed = pyqtSignal(int)
+    filterChanged = pyqtSignal(str, int)  # Filter name, intensity
+    showFilteredChanged = pyqtSignal(bool)  # Whether to show filtered stream
     
     def __init__(self, window_name, key_press_callback=None):
         """Initialize the window manager."""
@@ -137,6 +139,10 @@ class PyQtWindowManager(QMainWindow):
         
         # Create control panel
         self._create_control_panel()
+        
+        # Initialize filter state
+        self.current_filter = "none"
+        self.current_intensity = 50  # Store intensity as a value, not a widget
         
         self._is_window_created = False
         
@@ -178,6 +184,77 @@ class PyQtWindowManager(QMainWindow):
         detection_action.setCheckable(True)
         detection_action.triggered.connect(self._on_toggle_detection)
         view_menu.addAction(detection_action)
+        
+        # Filtered view action
+        filtered_view_action = QAction('Show &Filtered Stream', self)
+        filtered_view_action.setStatusTip('Toggle between raw and filtered video')
+        filtered_view_action.setCheckable(True)
+        filtered_view_action.toggled.connect(self._on_toggle_filtered_view)
+        view_menu.addAction(filtered_view_action)
+        self.filtered_view_action = filtered_view_action
+        
+        # Filters submenu
+        filters_menu = menubar.addMenu('&Filters')
+        
+        # No filter action
+        none_filter_action = QAction('&None', self)
+        none_filter_action.setData('none')
+        none_filter_action.triggered.connect(lambda: self._select_filter_from_menu('none'))
+        filters_menu.addAction(none_filter_action)
+        
+        # Edge detection action
+        edges_filter_action = QAction('&Edge Detection', self)
+        edges_filter_action.setData('edges')
+        edges_filter_action.triggered.connect(lambda: self._select_filter_from_menu('edges'))
+        filters_menu.addAction(edges_filter_action)
+        
+        # Sharpen action
+        sharpen_filter_action = QAction('&Sharpen', self)
+        sharpen_filter_action.setData('sharpen')
+        sharpen_filter_action.triggered.connect(lambda: self._select_filter_from_menu('sharpen'))
+        filters_menu.addAction(sharpen_filter_action)
+        
+        # Blur action
+        blur_filter_action = QAction('&Blur', self)
+        blur_filter_action.setData('blur')
+        blur_filter_action.triggered.connect(lambda: self._select_filter_from_menu('blur'))
+        filters_menu.addAction(blur_filter_action)
+        
+        # Emboss action
+        emboss_filter_action = QAction('E&mboss', self)
+        emboss_filter_action.setData('emboss')
+        emboss_filter_action.triggered.connect(lambda: self._select_filter_from_menu('emboss'))
+        filters_menu.addAction(emboss_filter_action)
+        
+        # Separator for color filters
+        filters_menu.addSeparator()
+        
+        # Color filters submenu
+        color_filters_menu = filters_menu.addMenu('Color Filters')
+        
+        # Cross Process action
+        cross_filter_action = QAction('Cross Process', self)
+        cross_filter_action.setData('cross_process')
+        cross_filter_action.triggered.connect(lambda: self._select_filter_from_menu('cross_process'))
+        color_filters_menu.addAction(cross_filter_action)
+        
+        # Portra action
+        portra_filter_action = QAction('Portra', self)
+        portra_filter_action.setData('portra')
+        portra_filter_action.triggered.connect(lambda: self._select_filter_from_menu('portra'))
+        color_filters_menu.addAction(portra_filter_action)
+        
+        # Provia action
+        provia_filter_action = QAction('Provia', self)
+        provia_filter_action.setData('provia')
+        provia_filter_action.triggered.connect(lambda: self._select_filter_from_menu('provia'))
+        color_filters_menu.addAction(provia_filter_action)
+        
+        # Velvia action
+        velvia_filter_action = QAction('Velvia', self)
+        velvia_filter_action.setData('velvia')
+        velvia_filter_action.triggered.connect(lambda: self._select_filter_from_menu('velvia'))
+        color_filters_menu.addAction(velvia_filter_action)
     
     def _create_toolbar(self):
         """Create the toolbar."""
@@ -248,6 +325,48 @@ class PyQtWindowManager(QMainWindow):
         video_group.setLayout(video_layout)
         dock_layout.addWidget(video_group)
         
+        # Image filters group
+        filter_group = QGroupBox("Image Filters")
+        filter_layout = QGridLayout()
+        
+        # Filter selection dropdown
+        filter_layout.addWidget(QLabel("Filter:"), 0, 0)
+        self.filter_combo = QComboBox()
+        self.filter_combo.addItem("None", "none")
+        self.filter_combo.addItem("Edge Detection", "edges")
+        self.filter_combo.addItem("Sharpen", "sharpen")
+        self.filter_combo.addItem("Blur", "blur")
+        self.filter_combo.addItem("Emboss", "emboss")
+        self.filter_combo.addItem("Cross Process", "cross_process")
+        self.filter_combo.addItem("Portra", "portra")
+        self.filter_combo.addItem("Provia", "provia")
+        self.filter_combo.addItem("Velvia", "velvia")
+        self.filter_combo.currentIndexChanged.connect(self._on_filter_changed)
+        filter_layout.addWidget(self.filter_combo, 0, 1)
+        
+        # Filter intensity slider (for some filters)
+        filter_layout.addWidget(QLabel("Intensity:"), 1, 0)
+        self.filter_intensity = QSlider(Qt.Horizontal)
+        self.filter_intensity.setMinimum(0)
+        self.filter_intensity.setMaximum(100)
+        self.filter_intensity.setValue(50)
+        self.filter_intensity.valueChanged.connect(self._on_intensity_changed)
+        filter_layout.addWidget(self.filter_intensity, 1, 1)
+        
+        # Checkbox to show filtered stream in the main UI
+        self.show_filtered_cb = QCheckBox("Show Filtered Stream")
+        self.show_filtered_cb.setChecked(False)
+        self.show_filtered_cb.toggled.connect(self._on_toggle_filtered_view)
+        filter_layout.addWidget(self.show_filtered_cb, 2, 0, 1, 2)
+        
+        # Add note about web stream
+        filter_note = QLabel("Note: Filtered stream available at port 8888")
+        filter_note.setWordWrap(True)
+        filter_layout.addWidget(filter_note, 3, 0, 1, 2)
+        
+        filter_group.setLayout(filter_layout)
+        dock_layout.addWidget(filter_group)
+        
         # Add stretch to push controls to the top
         dock_layout.addStretch()
         
@@ -307,6 +426,64 @@ class PyQtWindowManager(QMainWindow):
         
         # Re-enable signals
         self.show_detection_cb.blockSignals(False)
+    
+    def _on_filter_changed(self, index):
+        """Handle filter selection change."""
+        # Get the filter ID from the current index
+        filter_id = self.filter_combo.currentData()
+        self.current_filter = filter_id
+        
+        # Enable/disable intensity slider based on filter type if it exists
+        if hasattr(self, 'filter_intensity') and isinstance(self.filter_intensity, QSlider):
+            self.filter_intensity.setEnabled(filter_id != "none")
+        
+        # Emit signal that filter changed
+        self.filterChanged.emit(filter_id, self.current_intensity)
+        
+        # Update status bar
+        filter_name = self.filter_combo.currentText()
+        self.statusbar.showMessage(f'Filter set to {filter_name}', 2000)
+    
+    def _on_intensity_changed(self, value):
+        """Handle filter intensity slider change."""
+        self.current_intensity = value
+        self.filterChanged.emit(self.current_filter, value)
+    
+    def _on_toggle_filtered_view(self, checked):
+        """Handle toggle filtered view checkbox."""
+        # Block signals to prevent recursive callbacks
+        if hasattr(self, 'show_filtered_cb'):
+            self.show_filtered_cb.blockSignals(True)
+        if hasattr(self, 'filtered_view_action'):
+            self.filtered_view_action.blockSignals(True)
+            
+        # Update checkbox and menu item state
+        if hasattr(self, 'show_filtered_cb'):
+            self.show_filtered_cb.setChecked(checked)
+        if hasattr(self, 'filtered_view_action'):
+            self.filtered_view_action.setChecked(checked)
+            
+        # Emit signal that filtered view changed
+        self.showFilteredChanged.emit(checked)
+        
+        # Update status bar
+        if checked:
+            self.statusbar.showMessage('Showing filtered stream')
+        else:
+            self.statusbar.showMessage('Showing raw stream')
+            
+        # Re-enable signals
+        if hasattr(self, 'show_filtered_cb'):
+            self.show_filtered_cb.blockSignals(False)
+        if hasattr(self, 'filtered_view_action'):
+            self.filtered_view_action.blockSignals(False)
+    
+    def _select_filter_from_menu(self, filter_id):
+        """Handle filter selection from menu."""
+        # Update combo box to match menu selection
+        index = self.filter_combo.findData(filter_id)
+        if index >= 0:
+            self.filter_combo.setCurrentIndex(index)
     
     def _handle_key(self, keycode):
         """Handle key press signal."""

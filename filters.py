@@ -90,20 +90,12 @@ class BGRFuncFilter:
 class BGRCurveFilter(BGRFuncFilter):
     def __init__(self, v_points = None, b_points = None,
                  g_points = None, r_points = None):
-        BGRFuncFilter.__init__(
-            self, 
-            utils.create_composite_func(
-                utils.create_lookup_array,
-                utils.create_curve_func(v_points)),
-            utils.create_composite_func(
-                utils.create_lookup_array,
-                utils.create_curve_func(b_points)),
-            utils.create_composite_func(
-                utils.create_lookup_array,
-                utils.create_curve_func(g_points)),
-            utils.create_composite_func(
-                utils.create_lookup_array,
-                utils.create_curve_func(r_points)))
+        v_func = utils.create_curve_func(v_points)
+        b_func = utils.create_curve_func(b_points)
+        g_func = utils.create_curve_func(g_points)
+        r_func = utils.create_curve_func(r_points)
+        
+        BGRFuncFilter.__init__(self, v_func, b_func, g_func, r_func)
 
 
 class BGRCrossProcessCurveFilter(BGRCurveFilter):

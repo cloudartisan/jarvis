@@ -1,6 +1,6 @@
 # Jarvis: Computer Vision Project
 
-Jarvis is a computer vision application that can detect faces, track features, and provide video streaming capabilities. Built with OpenCV and Python 3.
+Jarvis is a computer vision application that can detect faces, track features, apply image filters, and provide video streaming capabilities. Built with OpenCV, PyQt5, and Python 3.
 
 ## Setup and Installation
 
@@ -92,19 +92,46 @@ You can view these streams in any web browser or embed them in other application
 
 ## Controls
 
+### Keyboard Shortcuts
 When the application window is in focus:
 - **Space**: Take a screenshot
 - **Tab**: Start/stop recording a screencast
 - **X**: Toggle debug view (shows face detection rectangles)
 - **Escape**: Quit the application
 
+### UI Controls
+The application features a control panel with:
+- Filter selector dropdown
+- Filter intensity slider
+- Toggle for displaying the filtered stream
+- Controls for screenshots and video recording
+
 ## Features
 
-- Face detection and tracking
-- Streaming video over HTTP
-- Video recording
-- Screenshot capture
-- Visual filters and effects
+- Face detection and tracking with:
+  - Multi-stage detection (DNN + cascade)
+  - Feature tracking (eyes, nose, mouth)
+  - Temporal smoothing to reduce jitter
+  - Adaptive frame skipping for better performance
+
+- Real-time image processing with filters:
+  - **Edge Detection**: Highlights outlines and boundaries in the image
+  - **Sharpen**: Enhances details and makes the image crisper
+  - **Blur**: Smooths out noise and reduces detail
+  - **Emboss**: Creates a 3D relief effect highlighting edges
+  - **Film Emulation Filters**:
+    - **Cross Process**: High contrast with altered colours, mimicking cross-processed film
+    - **Portra**: Warm, natural skin tones inspired by Kodak Portra film
+    - **Provia**: Balanced, natural colours inspired by Fuji Provia film
+    - **Velvia**: Vibrant, saturated colours inspired by Fuji Velvia film
+
+- Dual streaming over HTTP:
+  - Raw video stream
+  - Processed/filtered stream
+  
+- Media creation:
+  - Video recording
+  - Screenshot capture
 
 ## Troubleshooting
 
@@ -138,10 +165,28 @@ When the application window is in focus:
 ## Project Structure
 
 - `jarvis.py` - Main application file
-- `managers.py` - Window, capture, and streaming management
-- `trackers.py` - Face and feature tracking
+- `managers.py` - Capture and streaming management
+- `video_ui.py` - PyQt5 UI components and window management
+- `face_detector.py` - Face and feature detection and tracking
 - `streams.py` - Video stream abstractions
 - `utils.py` - Helper functions
-- `rects.py` - Rectangle handling functions 
+- `rects.py` - Rectangle handling functions
+- `colours.py` - Colour constants for visual elements
+- `filters.py` - Image processing filters and effects
+- `face_detection/` - Package for different detection algorithms
+  - `base.py` - Base classes for detection
+  - `dnn_detector.py` - Deep neural network detector
+  - `haar_detector.py` - Haar cascade detector
+  - `face_recognition.py` - Face feature recognition
 - `cascades/` - OpenCV face detection XML files
 - `scripts/` - Utility scripts for face detection, web streaming, and speech transcription
+
+## Using the Image Filters
+
+1. Run the main application: `python jarvis.py`
+2. Select a filter from the dropdown menu or Filters menu
+3. Adjust the intensity using the slider
+4. Toggle "Show Filtered Stream" to view the filtered video in the main window
+5. View both streams simultaneously by opening these URLs in a browser:
+   - Raw stream: http://localhost:8000/
+   - Filtered stream: http://localhost:8888/
