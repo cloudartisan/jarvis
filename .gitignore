@@ -1,7 +1,20 @@
-env
+# Python virtual environments
+env/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Project-specific
 training/data/
-*.pyc
 screenshot.png
 screencast.avi
+
 # Don't include downloaded model files
 models/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+.DS_Store

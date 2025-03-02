@@ -28,7 +28,12 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. Verify OpenCV is properly installed:
+3. Install the package in development mode:
+```bash
+pip install -e .
+```
+
+4. Verify OpenCV is properly installed:
 ```bash
 python -c "import cv2; print(cv2.__version__)"
 ```
@@ -40,7 +45,7 @@ python -c "import cv2; print(cv2.__version__)"
 source venv/bin/activate
 
 # Run the main application
-python jarvis.py
+python run_jarvis.py
 ```
 
 You can also run the individual utility scripts:
@@ -81,7 +86,7 @@ Note: The test script uses Google's Speech-to-Text API and requires credentials.
 
 ## Web Streaming
 
-The main application (jarvis.py) provides two web streams:
+The main application (run_jarvis.py) provides two web streams:
 - Raw camera feed: http://localhost:8000/ - Shows the original camera feed without any processing
 - Processed video feed: http://localhost:8888/ - Displays the feed with applied filters and face detection annotations (when debug mode is enabled)
 
@@ -94,8 +99,8 @@ You can view these streams in any web browser or embed them in other application
 
 ### Keyboard Shortcuts
 When the application window is in focus:
-- **Space**: Take a screenshot
-- **Tab**: Start/stop recording a screencast
+- **Space**: Take a screenshot (saves as screenshot.png in project root)
+- **Tab**: Start/stop recording a screencast (saves as screencast.avi in project root)
 - **X**: Toggle debug view (shows face detection rectangles)
 - **Escape**: Quit the application
 
@@ -210,6 +215,15 @@ jarvis/
 5. View both streams simultaneously by opening these URLs in a browser:
    - Raw stream: http://localhost:8000/
    - Filtered stream: http://localhost:8888/
+
+## Face Recognition Training
+
+The application supports face recognition using the `FaceRecognizer` class. To train the system:
+
+1. Create a subdirectory for each person under `training/data/`
+2. Add multiple facial images of each person to their respective directory
+3. Optionally include a `name.txt` file in each person's directory with their name
+4. The training data is located in the project root under `training/data/`
 
 ## Future Development
 
