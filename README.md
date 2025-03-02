@@ -33,6 +33,12 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
+This uses setup.py to install the package with the following benefits:
+- Installs all dependencies listed in setup.py
+- Creates the `jarvis` console command (defined in entry_points)
+- Includes required data files like cascade XMLs
+- Allows you to modify the code without reinstalling
+
 4. Verify OpenCV is properly installed:
 ```bash
 python -c "import cv2; print(cv2.__version__)"
@@ -44,8 +50,10 @@ python -c "import cv2; print(cv2.__version__)"
 # Make sure your virtual environment is activated
 source venv/bin/activate
 
-# Run the main application
+# Run the main application (either method works)
 python run_jarvis.py
+# OR using the console entry point after installing with setup.py
+jarvis
 ```
 
 You can also run the individual utility scripts:
