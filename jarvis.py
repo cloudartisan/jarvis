@@ -246,19 +246,19 @@ class Jarvis(object):
                     # Update the debug state in the UI
                     self.window_manager.video_display.set_debug_mode(self._should_draw_debug)
                     
-                    # Apply filter to create processed frame if needed
+                    # Create a copy of the frame for processing
+                    processed_frame = frame.copy()
+                    
+                    # Apply filter to the processed frame if needed
                     if self.current_filter and self.current_filter != 'none':
-                        # Create a copy of the frame for processing
-                        processed_frame = frame.copy()
-                        
                         # Apply the selected filter
                         self.apply_filter(processed_frame, processed_frame)
-                        
-                        # Update the processed stream with the filtered frame
-                        self.processed_camera_stream.frame = processed_frame
-                    else:
-                        # No filter, use raw frame
-                        self.processed_camera_stream.frame = frame
+                    
+                    # Apply face detection annotations to the processed frame
+                    self._draw_face_annotations(processed_frame)
+                    
+                    # Update the processed stream with the processed frame
+                    self.processed_camera_stream.frame = processed_frame
                     
                     # Decide which frame to show in the UI
                     if self.show_filtered_view and self.current_filter and self.current_filter != 'none':
@@ -372,6 +372,55 @@ class Jarvis(object):
         """Handle change in whether to show filtered stream."""
         logging.info(f"Show filtered view changed to {show_filtered}")
         self.show_filtered_view = show_filtered
+        
+    def _draw_face_annotations(self, frame):
+        """Draw face detection annotations on the given frame."""
+        if not self._should_draw_debug or not hasattr(self, '_smoothed_faces') or not self._smoothed_faces:
+            return
+            
+        # Import colours here to avoid circular imports
+        import colours
+        
+        # Draw debug overlay
+        for face in self._smoothed_faces:
+            # Draw face rectangle with a more refined thickness
+            if face.face_rect is not None:
+                x, y, w, h = face.face_rect
+                cv2.rectangle(frame, (x, y), (x+w, y+h), colours.FACE_COLOUR, 3)
+            
+            # Draw eye rectangles with more subtle thickness
+            if face.left_eye_rect is not None:
+                x, y, w, h = face.left_eye_rect
+                cv2.rectangle(frame, (x, y), (x+w, y+h), colours.LEFT_EYE_COLOUR, 2)
+                
+            if face.right_eye_rect is not None:
+                x, y, w, h = face.right_eye_rect
+                cv2.rectangle(frame, (x, y), (x+w, y+h), colours.RIGHT_EYE_COLOUR, 2)
+            
+            # Draw nose and mouth rectangles with refined thickness
+            if face.nose_rect is not None:
+                x, y, w, h = face.nose_rect
+                cv2.rectangle(frame, (x, y), (x+w, y+h), colours.NOSE_COLOUR, 2)
+                
+            if face.mouth_rect is not None:
+                x, y, w, h = face.mouth_rect
+                cv2.rectangle(frame, (x, y), (x+w, y+h), colours.MOUTH_COLOUR, 2)
+        
+        # Draw text for number of faces
+        h, w = frame.shape[:2]
+        found = f"Faces: {len(self._smoothed_faces)}"
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        x_pos = int(w * 0.05)
+        y_pos = int(h * 0.1)
+        
+        # Create a background box for better text readability
+        text_size = cv2.getTextSize(found, font, 1.2, 2)[0]
+        box_coords = ((x_pos-10, y_pos+10), (x_pos + text_size[0]+10, y_pos - text_size[1]-10))
+        cv2.rectangle(frame, box_coords[0], box_coords[1], (0, 0, 0), -1)  # Filled black background
+        
+        # Draw text with improved readability
+        cv2.putText(frame, found, (x_pos, y_pos), font, 1.2, colours.TEXT_OUTLINE_COLOUR, 4, cv2.LINE_AA)
+        cv2.putText(frame, found, (x_pos, y_pos), font, 1.2, colours.HIGHLIGHT_TEXT_COLOUR, 2, cv2.LINE_AA)
     
     def on_key_press(self, keycode):
         """Handle a key press.
