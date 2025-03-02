@@ -1,13 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 """
 A Simple mjpg stream http server
 """
 
 import threading
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from SocketServer import ThreadingMixIn
-import StringIO
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
+from io import BytesIO
 import time
 
 import cv2
@@ -31,24 +31,31 @@ class CamHandler(BaseHTTPRequestHandler):
                         continue
                     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                     jpg = Image.fromarray(image_rgb)
-                    tmp_file = StringIO.StringIO()
+                    tmp_file = BytesIO()
                     jpg.save(tmp_file, 'JPEG')
-                    self.wfile.write("--jpgboundary")
+                    self.wfile.write(b"--jpgboundary")
                     self.send_header('Content-type', 'image/jpeg')
-                    self.send_header('Content-length', str(tmp_file.len))
+                    self.send_header('Content-length', str(tmp_file.getbuffer().nbytes))
                     self.end_headers()
-                    jpg.save(self.wfile, 'JPEG')
-                    time.sleep(0.05)
+                    try:
+                        jpg.save(self.wfile, 'JPEG')
+                        time.sleep(0.05)
+                    except (BrokenPipeError, ConnectionResetError):
+                        # Client disconnected
+                        break
                 except KeyboardInterrupt:
+                    break
+                except Exception as e:
+                    print(f"Error in stream loop: {e}")
                     break
             return
         if self.path.endswith('.html'):
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            self.wfile.write('<html><head></head><body>')
-            self.wfile.write('<image src="http://127.0.0.1:8080/cam.mjpg"/>')
-            self.wfile.write('</body></html>')
+            self.wfile.write(b'<html><head></head><body>')
+            self.wfile.write(b'<image src="http://127.0.0.1:8080/cam.mjpg"/>')
+            self.wfile.write(b'</body></html>')
             return
 
 
@@ -65,7 +72,7 @@ def main():
     global image
     try:
         server = ThreadedHTTPServer(('localhost', 8080), CamHandler)
-        print "server started"
+        print("server started")
         server.serve_forever()
     except KeyboardInterrupt:
         capture.release()

@@ -1,18 +1,27 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 import cv2
-import Tkinter
+try:
+    import tkinter
+except ImportError:
+    # If tkinter is not available, provide a fallback
+    tkinter = None
 import numpy
 import scipy.interpolate
 
 
 def get_screen_resolution():
-    root = Tkinter.Tk()
-    width = root.winfo_screenwidth()
-    height = root.winfo_screenheight()
-    print "Screen resolution: {} x {}".format(width, height)
-    return width, height
+    if tkinter is None:
+        # Fallback values if tkinter is not available
+        print("Tkinter not available, using default resolution")
+        return 1280, 720
+    else:
+        root = tkinter.Tk()
+        width = root.winfo_screenwidth()
+        height = root.winfo_screenheight()
+        print("Screen resolution: {} x {}".format(width, height))
+        return width, height
 
 
 def draw_rectangle(image, rectangle_coordinates):
@@ -83,7 +92,7 @@ def create_curve_func(points):
     else:
         kind = 'cubic'
     return scipy.interpolate.interp1d(xs, ys, kind,
-                                      bounds_error = False)
+                                  bounds_error = False)
 
 
 def create_composite_func(func0, func1):
@@ -103,7 +112,7 @@ def is_gray(image):
 def width_height_divided_by(image, divisor):
     """Return an image's dimensions, divided by a value."""
     h, w = image.shape[:2]
-    return (w/divisor, h/divisor)
+    return (int(w/divisor), int(h/divisor))
 
 
 if __name__ == '__main__':

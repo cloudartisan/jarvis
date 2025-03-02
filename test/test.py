@@ -3,8 +3,6 @@ import os
 
 # Imports the Google Cloud client library
 from google.cloud import speech
-from google.cloud.speech import enums
-from google.cloud.speech import types
 
 # Instantiates a client
 client = speech.SpeechClient()
@@ -18,10 +16,10 @@ file_name = os.path.join(
 # Loads the audio into memory
 with io.open(file_name, 'rb') as audio_file:
     content = audio_file.read()
-    audio = types.RecognitionAudio(content=content)
+    audio = speech.RecognitionAudio(content=content)
 
-config = types.RecognitionConfig(
-    encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
+config = speech.RecognitionConfig(
+    encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
     sample_rate_hertz=16000,
     language_code='en-US')
 
@@ -31,4 +29,3 @@ alternatives = response.results[0].alternatives
 
 for alternative in alternatives:
     print('Transcript: {}'.format(alternative.transcript))
-

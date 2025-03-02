@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
@@ -27,23 +27,19 @@ To install using pip:
     pip install pyaudio
 """
 
-from __future__ import division
-
 from google.cloud import speech
-from google.cloud.speech import enums
-from google.cloud.speech import types
 import pyaudio
-from six.moves import queue
+from queue import Queue
 
 
-class MicrophoneStream(object):
+class MicrophoneStream:
     """Opens a recording stream as a generator yielding the audio chunks."""
     def __init__(self, rate, chunk):
         self._rate = rate
         self._chunk = chunk
 
         # Create a thread-safe buffer of audio data
-        self._buff = queue.Queue()
+        self._buff = Queue()
         self.closed = True
 
     def __enter__(self):
@@ -95,7 +91,7 @@ class MicrophoneStream(object):
                     if chunk is None:
                         return
                     data.append(chunk)
-                except queue.Empty:
+                except Queue.Empty:
                     break
 
             yield b''.join(data)

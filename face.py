@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 import sys
@@ -50,25 +50,18 @@ class FaceRecogniser:
     def train(self, training_data_path):
         faces = []
         labels = []
-        #cv2.namedWindow('Training...', cv2.WND_PROP_FULLSCREEN)
-        #cv2.setWindowProperty('Training...', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-        #screen_width, screen_height = utils.get_screen_resolution()
-        #window_width = int(screen_width * 0.8)
-        #window_height = int(screen_height * 0.8)
-        #cv2.namedWindow('Training...', cv2.WINDOW_NORMAL)
-        #cv2.resizeWindow('Training...', window_width, window_height)
         cv2.namedWindow('Training...')
         cv2.moveWindow('Training...', 0, 0)
 
         dirs = os.listdir(training_data_path)
-        print dirs
+        print(dirs)
 
         label = 0
         for dir_name in dirs:
             if dir_name.startswith('.'):
                 continue
             subject = dir_name
-            print subject, label
+            print(subject, label)
             subject_path = os.path.join(training_data_path, dir_name)
             subject_image_files = os.listdir(subject_path)
             # Read each image, detect the face, add the detected face to the
@@ -77,12 +70,11 @@ class FaceRecogniser:
                 # Ignore system files like .DS_Store
                 if image_name.startswith('.') or image_name == 'name.txt':
                     continue
-                print image_name
+                print(image_name)
                 image_path = os.path.join(subject_path, image_name)
                 image = cv2.imread(image_path)
 
                 # Display an image window to show the image
-                #cv2.imshow('Training...', image)
                 small_image = cv2.resize(image, None, fx = 0.1, fy = 0.1)
                 cv2.imshow('Training...', small_image)
                 cv2.waitKey(100)

@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 import time
-import StringIO
+from io import BytesIO
 from threading import Thread
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from SocketServer import ThreadingMixIn
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
 
 import cv2
 import numpy
@@ -75,20 +75,20 @@ class WebRequestHandler(BaseHTTPRequestHandler):
                     continue
                 image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 image = Image.fromarray(image)
-                s = StringIO.StringIO()
+                s = BytesIO()
                 image.save(s, 'JPEG')
-                self.wfile.write('--jpgboundary')
+                self.wfile.write(b'--jpgboundary')
                 self.send_header('Content-type', 'image/jpeg')
-                self.send_header('Content-length', str(s.len))
+                self.send_header('Content-length', str(s.getbuffer().nbytes))
                 self.end_headers()
                 image.save(self.wfile, 'JPEG')
         else:
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            self.wfile.write('<html><head></head><body>')
-            self.wfile.write('<img src="/stream.mjpg"/>')
-            self.wfile.write('</body></html>')
+            self.wfile.write(b'<html><head></head><body>')
+            self.wfile.write(b'<img src="/stream.mjpg"/>')
+            self.wfile.write(b'</body></html>')
 
 
 class ThreadedWebStream(Thread):

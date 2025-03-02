@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 import cv2
@@ -6,7 +6,7 @@ import rects
 import utils
 
 
-class Face(object):
+class Face:
     """Data on facial features: face, eyes, nose, mouth."""
     def __init__(self):
         self.face_rect = None
@@ -16,7 +16,7 @@ class Face(object):
         self.mouth_rect = None
 
 
-class FaceTracker(object):
+class FaceTracker:
     """A tracker for facial features: face, eyes, nose, mouth."""
     def __init__(self, scale_factor=1.2, min_neighbours=2, flags=None):
         self.scale_factor = scale_factor
@@ -64,22 +64,22 @@ class FaceTracker(object):
                 x, y, w, h = face_rect
 
                 # Seek an eye in the upper-left part of the face.
-                search_rect = (x+w/7, y, w*2/7, h/2)
+                search_rect = (x+int(w/7), y, int(w*2/7), int(h/2))
                 face.left_eye_rect = self._detect_one_object(
                     self._eye_classifier, image, search_rect, 64)
 
                 # Seek an eye in the upper-right part of the face.
-                search_rect = (x+w*4/7, y, w*2/7, h/2)
+                search_rect = (x+int(w*4/7), y, int(w*2/7), int(h/2))
                 face.right_eye_rect = self._detect_one_object(
                     self._eye_classifier, image, search_rect, 64)
 
                 # Seek a nose in the middle part of the face.
-                search_rect = (x+w/4, y+h/4, w/2, h/2)
+                search_rect = (x+int(w/4), y+int(h/4), int(w/2), int(h/2))
                 face.nose_rect = self._detect_one_object(
                     self._nose_classifier, image, search_rect, 32)
 
                 # Seek a mouth in the lower-middle part of the face.
-                search_rect = (x+w/6, y+h*2/3, w*2/3, h/3)
+                search_rect = (x+int(w/6), y+int(h*2/3), int(w*2/3), int(h/3))
                 face.mouth_rect = self._detect_one_object(
                     self._mouth_classifier, image, search_rect, 16)
 

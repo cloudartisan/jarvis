@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
@@ -30,18 +30,23 @@ To install using pip:
     pip install pyaudio
 """
 
-from __future__ import division
-
 import re
 import sys
 
 from google.cloud import speech
-from google.cloud.speech import enums
-from google.cloud.speech import types
 
 # Audio recording parameters
 RATE = 16000
 CHUNK = int(RATE / 10)  # 100ms
+
+# Fix for older code that used enums and types
+if not hasattr(speech, 'RecognitionConfig'):
+    # Old API style
+    from google.cloud.speech import enums
+    from google.cloud.speech import types
+else:
+    # New API style - we'll use this directly
+    pass
 
 
 def listen_print_loop(responses):
@@ -103,7 +108,7 @@ def main():
     if __package__ is None:
         import sys
         from os import path
-        sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
+        sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
         from mic import MicrophoneStream
     else:
         from ..mic import MicrophoneStream
@@ -113,18 +118,39 @@ def main():
     language_code = 'en-US'  # a BCP-47 language tag
 
     client = speech.SpeechClient()
-    config = types.RecognitionConfig(
-        encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=RATE,
-        language_code=language_code)
-    streaming_config = types.StreamingRecognitionConfig(
-        config=config,
-        interim_results=True)
+    
+    # Handle both old and new API styles
+    if hasattr(speech, 'RecognitionConfig'):
+        # New API style
+        config = speech.RecognitionConfig(
+            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+            sample_rate_hertz=RATE,
+            language_code=language_code)
+        streaming_config = speech.StreamingRecognitionConfig(
+            config=config,
+            interim_results=True)
+    else:
+        # Old API style
+        config = types.RecognitionConfig(
+            encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
+            sample_rate_hertz=RATE,
+            language_code=language_code)
+        streaming_config = types.StreamingRecognitionConfig(
+            config=config,
+            interim_results=True)
 
     with MicrophoneStream(RATE, CHUNK) as stream:
         audio_generator = stream.generator()
-        requests = (types.StreamingRecognizeRequest(audio_content=content)
-                    for content in audio_generator)
+        
+        # Handle both old and new API styles
+        if hasattr(speech, 'StreamingRecognizeRequest'):
+            # New API style
+            requests = (speech.StreamingRecognizeRequest(audio_content=content)
+                        for content in audio_generator)
+        else:
+            # Old API style
+            requests = (types.StreamingRecognizeRequest(audio_content=content)
+                        for content in audio_generator)
 
         responses = client.streaming_recognize(streaming_config, requests)
 
