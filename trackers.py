@@ -4,16 +4,7 @@
 import cv2
 import rects
 import utils
-
-
-class Face:
-    """Data on facial features: face, eyes, nose, mouth."""
-    def __init__(self):
-        self.face_rect = None
-        self.left_eye_rect = None
-        self.right_eye_rect = None
-        self.nose_rect = None
-        self.mouth_rect = None
+from face_detection import Face, DNNFaceDetector, HaarFaceDetector
 
 
 class FaceTracker:
@@ -24,10 +15,9 @@ class FaceTracker:
         self.min_neighbours = min_neighbours
         self._faces = []
         
-        # Try to use DNN face detector first
+        # Initialize face detectors
         try:
-            from dnn_face_detector import DNNFaceDetector
-            # Lower confidence threshold for better detection (0.5 instead of 0.7)
+            # Create DNN detector with lower confidence threshold for better detection
             self._dnn_detector = DNNFaceDetector(min_confidence=0.5)
             self._use_dnn = True
             print("Using DNN face detector for improved accuracy")
