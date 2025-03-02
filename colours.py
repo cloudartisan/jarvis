@@ -4,13 +4,13 @@ Color constants and utilities for computer vision applications.
 BGR is the default format used by OpenCV.
 """
 
-# BGR color constants (BGR order as used by OpenCV)
+# BGR colour constants
 WHITE_BGR = (255, 255, 255)
 BLACK_BGR = (0, 0, 0)
-RED_BGR = (0, 0, 255)     # Red is (0,0,255) in BGR
+RED_BGR = (0, 0, 255)
 YELLOW_BGR = (0, 255, 255)
 GREEN_BGR = (0, 255, 0)
-BLUE_BGR = (255, 0, 0)    # Blue is (255,0,0) in BGR
+BLUE_BGR = (255, 0, 0)
 CYAN_BGR = (255, 255, 0)
 MAGENTA_BGR = (255, 0, 255)
 ORANGE_BGR = (0, 165, 255)
@@ -18,17 +18,21 @@ PURPLE_BGR = (128, 0, 128)
 PINK_BGR = (203, 192, 255)
 GRAY_BGR = (128, 128, 128)
 
-# Face feature colors
-FACE_COLOR = WHITE_BGR
-LEFT_EYE_COLOR = RED_BGR
-RIGHT_EYE_COLOR = YELLOW_BGR
-NOSE_COLOR = GREEN_BGR
-MOUTH_COLOR = BLUE_BGR
+# Face detection colours
+PRIMARY_COLOUR = (180, 180, 255)
+SECONDARY_COLOUR = (128, 200, 128)
 
-# Text colors
-TEXT_OUTLINE_COLOR = BLACK_BGR
-TEXT_COLOR = WHITE_BGR
-HIGHLIGHT_TEXT_COLOR = YELLOW_BGR
+# Face feature colours
+FACE_COLOUR = (180, 180, 255)
+LEFT_EYE_COLOUR = (200, 162, 124)
+RIGHT_EYE_COLOUR = (200, 162, 124)
+NOSE_COLOUR = (128, 200, 128)
+MOUTH_COLOUR = (128, 200, 200)
+
+# Text colours
+TEXT_OUTLINE_COLOUR = (0, 0, 0)
+TEXT_COLOUR = (255, 255, 255)
+HIGHLIGHT_TEXT_COLOUR = (255, 255, 255)
 
 # HSV min/max values for the green range
 GREEN_HSV_RANGE = {

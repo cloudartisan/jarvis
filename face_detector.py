@@ -8,8 +8,8 @@ import colours
 from face_detection import Face, DNNFaceDetector, HaarFaceDetector
 
 
-class FaceTracker:
-    """A tracker for facial features: face, eyes, nose, mouth."""
+class FaceDetector:
+    """Detects faces and facial features (eyes, nose, mouth) in images."""
     def __init__(self, scale_factor=1.1, min_neighbours=5, flags=None):
         # Using improved parameters from face.py
         self.scale_factor = scale_factor
@@ -42,7 +42,7 @@ class FaceTracker:
 
     @property
     def faces(self):
-        """The tracked facial features."""
+        """The detected facial features."""
         return self._faces
 
     def _detect_faces_with_haar(self, gray_image):
@@ -189,62 +189,5 @@ class FaceTracker:
         sub_x, sub_y, sub_w, sub_h = sub_rects[0]
         return (x+sub_x, y+sub_y, sub_w, sub_h)
 
-    def draw_debug_text(self, image):
-        """Draw text indicating the number of detected faces."""
-        if utils.is_gray(image):
-            text_colour = 255
-        else:
-            text_colour = (255, 255, 255)
-
-        found = "Faces: {}".format(len(self.faces))
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        
-        # Calculate position based on percentage of frame dimensions
-        h, w = image.shape[:2]
-        x_pos = int(w * 0.15)  # 15% from the left edge (moved rightward)
-        y_pos = int(h * 0.10)  # 10% from the top edge (moved downward)
-        
-        # Draw outline for better visibility against any background
-        cv2.putText(image, found, (x_pos, y_pos), font, 0.8, colours.TEXT_OUTLINE_COLOR, 3, cv2.LINE_AA)
-        # Draw text in white
-        cv2.putText(image, found, (x_pos, y_pos), font, 0.8, colours.TEXT_COLOR, 1, cv2.LINE_AA)
-
-    def draw_debug_rects(self, image):
-        """Draw rectangles around the tracked facial features."""
-        if utils.is_gray(image):
-            face_colour = 255
-            left_eye_colour = 255
-            right_eye_colour = 255
-            nose_colour = 255
-            mouth_colour = 255
-        else:
-            face_colour = colours.FACE_COLOR
-            left_eye_colour = colours.LEFT_EYE_COLOR
-            right_eye_colour = colours.RIGHT_EYE_COLOR
-            nose_colour = colours.NOSE_COLOR
-            mouth_colour = colours.MOUTH_COLOR
-
-        # Draw with thicker borders for better visibility
-        for face in self.faces:
-            # Draw face rectangle with 3px thickness
-            if face.face_rect is not None:
-                x, y, w, h = face.face_rect
-                cv2.rectangle(image, (x, y), (x+w, y+h), face_colour, 3)
-            
-            # Draw eye rectangles with 2px thickness
-            if face.left_eye_rect is not None:
-                x, y, w, h = face.left_eye_rect
-                cv2.rectangle(image, (x, y), (x+w, y+h), left_eye_colour, 2)
-                
-            if face.right_eye_rect is not None:
-                x, y, w, h = face.right_eye_rect
-                cv2.rectangle(image, (x, y), (x+w, y+h), right_eye_colour, 2)
-            
-            # Draw nose and mouth rectangles with 2px thickness
-            if face.nose_rect is not None:
-                x, y, w, h = face.nose_rect
-                cv2.rectangle(image, (x, y), (x+w, y+h), nose_colour, 2)
-                
-            if face.mouth_rect is not None:
-                x, y, w, h = face.mouth_rect
-                cv2.rectangle(image, (x, y), (x+w, y+h), mouth_colour, 2)
+# Note: Debug drawing methods have been removed as they've been moved to qt_managers.py
+# This avoids duplicating code and separates detection logic from visualization

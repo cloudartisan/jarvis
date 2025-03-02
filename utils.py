@@ -2,26 +2,37 @@
 
 
 import cv2
-try:
-    import tkinter
-except ImportError:
-    # If tkinter is not available, provide a fallback
-    tkinter = None
 import numpy
 import scipy.interpolate
 
 
+# Modern screen resolution function using PyQt5
 def get_screen_resolution():
-    if tkinter is None:
-        # Fallback values if tkinter is not available
-        print("Tkinter not available, using default resolution")
-        return 1280, 720
-    else:
-        root = tkinter.Tk()
-        width = root.winfo_screenwidth()
-        height = root.winfo_screenheight()
-        print("Screen resolution: {} x {}".format(width, height))
+    """
+    Get the primary screen resolution using PyQt5.
+    This is a more consistent approach with our UI framework.
+    
+    Returns:
+        tuple: (width, height) of the primary screen
+    """
+    try:
+        from PyQt5.QtWidgets import QApplication
+        from PyQt5.QtCore import QCoreApplication
+        
+        # Use existing application instance if one exists
+        app = QCoreApplication.instance()
+        if app is None:
+            app = QApplication([])
+            
+        screen = app.primaryScreen()
+        geometry = screen.geometry()
+        width, height = geometry.width(), geometry.height()
+        print(f"Screen resolution: {width} x {height}")
         return width, height
+    except ImportError:
+        # Fallback if PyQt5 is not available
+        print("PyQt5 not available, using default resolution")
+        return 1280, 720
 
 
 def draw_rectangle(image, rectangle_coordinates):

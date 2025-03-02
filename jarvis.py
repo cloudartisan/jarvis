@@ -9,8 +9,8 @@ import cv2
 import filters
 import rects
 from managers import ThreadedCaptureManager
-from qt_managers import PyQtWindowManager
-from trackers import FaceTracker
+from video_ui import PyQtWindowManager
+from face_detector import FaceDetector
 from streams import DummyStream, WebcamVideoStream, ThreadedWebStream
 from face_detection import Face
 
@@ -22,7 +22,7 @@ class Jarvis(object):
         self.raw_web_stream = ThreadedWebStream(self.raw_camera_stream, port=8000)
         self.processed_camera_stream = DummyStream()
         self.processed_web_stream = ThreadedWebStream(self.processed_camera_stream, port=8888)
-        self.face_tracker = FaceTracker()
+        self.face_detector = FaceDetector()
         self.window_manager = PyQtWindowManager('Jarvis - Computer Vision', self.on_key_press)
         self.capture_manager = ThreadedCaptureManager(self.raw_camera_stream,
                 False, None, False)
@@ -64,8 +64,8 @@ class Jarvis(object):
                     
                     # Update face detection on some frames, not every frame
                     if self._detection_interval >= self._detection_frame_skip:
-                        self.face_tracker.update(frame)
-                        current_faces = self.face_tracker.faces
+                        self.face_detector.update(frame)
+                        current_faces = self.face_detector.faces
                         
                         # Reset counter and set next skip amount
                         self._detection_interval = 0

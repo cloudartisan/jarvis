@@ -47,28 +47,28 @@ class VideoDisplay(QLabel):
         if self._debug_mode and self._faces:
             # Draw with thick lines for better visibility
             for face in self._faces:
-                # Draw face rectangle with thick white outline
+                # Draw face rectangle with a more refined thickness
                 if face.face_rect is not None:
                     x, y, w, h = face.face_rect
-                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), colours.FACE_COLOR, 6)
+                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), colours.FACE_COLOUR, 3)
                 
-                # Draw eye rectangles with red/yellow
+                # Draw eye rectangles with more subtle thickness
                 if face.left_eye_rect is not None:
                     x, y, w, h = face.left_eye_rect
-                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), colours.LEFT_EYE_COLOR, 4)
+                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), colours.LEFT_EYE_COLOUR, 2)
                     
                 if face.right_eye_rect is not None:
                     x, y, w, h = face.right_eye_rect
-                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), colours.RIGHT_EYE_COLOR, 4)
+                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), colours.RIGHT_EYE_COLOUR, 2)
                 
-                # Draw nose and mouth rectangles
+                # Draw nose and mouth rectangles with refined thickness
                 if face.nose_rect is not None:
                     x, y, w, h = face.nose_rect
-                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), colours.NOSE_COLOR, 4)
+                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), colours.NOSE_COLOUR, 2)
                     
                 if face.mouth_rect is not None:
                     x, y, w, h = face.mouth_rect
-                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), colours.MOUTH_COLOR, 4)
+                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), colours.MOUTH_COLOUR, 2)
             
             # Draw text for number of faces
             h, w = display_frame.shape[:2]
@@ -76,10 +76,14 @@ class VideoDisplay(QLabel):
             font = cv2.FONT_HERSHEY_SIMPLEX
             x_pos = int(w * 0.05)
             y_pos = int(h * 0.1)
-            # Draw text with thick black outline for visibility
-            cv2.putText(display_frame, found, (x_pos, y_pos), font, 1.5, colours.TEXT_OUTLINE_COLOR, 8, cv2.LINE_AA)
-            # Draw text in bright yellow for contrast
-            cv2.putText(display_frame, found, (x_pos, y_pos), font, 1.5, colours.HIGHLIGHT_TEXT_COLOR, 3, cv2.LINE_AA)
+            # Create a background box for better text readability
+            text_size = cv2.getTextSize(found, font, 1.2, 2)[0]
+            box_coords = ((x_pos-10, y_pos+10), (x_pos + text_size[0]+10, y_pos - text_size[1]-10))
+            cv2.rectangle(display_frame, box_coords[0], box_coords[1], (0, 0, 0), -1)  # Filled black background
+            
+            # Draw text with improved readability
+            cv2.putText(display_frame, found, (x_pos, y_pos), font, 1.2, colours.TEXT_OUTLINE_COLOUR, 4, cv2.LINE_AA)
+            cv2.putText(display_frame, found, (x_pos, y_pos), font, 1.2, colours.HIGHLIGHT_TEXT_COLOUR, 2, cv2.LINE_AA)
             
         # Convert BGR to RGB format
         rgb_frame = cv2.cvtColor(display_frame, cv2.COLOR_BGR2RGB)
@@ -97,7 +101,7 @@ class VideoDisplay(QLabel):
 
 
 class PyQtWindowManager(QMainWindow):
-    """Modern window manager for Jarvis using PyQt5."""
+    """Main application window and video display for Jarvis."""
     
     keyPressed = pyqtSignal(int)
     
