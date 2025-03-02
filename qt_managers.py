@@ -4,6 +4,7 @@ import logging
 import sys
 import cv2
 import numpy as np
+import colours
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap, QPainter, QColor, QFont
 from PyQt5.QtWidgets import (
@@ -49,25 +50,25 @@ class VideoDisplay(QLabel):
                 # Draw face rectangle with thick white outline
                 if face.face_rect is not None:
                     x, y, w, h = face.face_rect
-                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), (255, 255, 255), 6)
+                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), colours.FACE_COLOR, 6)
                 
                 # Draw eye rectangles with red/yellow
                 if face.left_eye_rect is not None:
                     x, y, w, h = face.left_eye_rect
-                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), (0, 0, 255), 4)
+                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), colours.LEFT_EYE_COLOR, 4)
                     
                 if face.right_eye_rect is not None:
                     x, y, w, h = face.right_eye_rect
-                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), (0, 255, 255), 4)
+                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), colours.RIGHT_EYE_COLOR, 4)
                 
                 # Draw nose and mouth rectangles
                 if face.nose_rect is not None:
                     x, y, w, h = face.nose_rect
-                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), (0, 255, 0), 4)
+                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), colours.NOSE_COLOR, 4)
                     
                 if face.mouth_rect is not None:
                     x, y, w, h = face.mouth_rect
-                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), (255, 0, 0), 4)
+                    cv2.rectangle(display_frame, (x, y), (x+w, y+h), colours.MOUTH_COLOR, 4)
             
             # Draw text for number of faces
             h, w = display_frame.shape[:2]
@@ -76,9 +77,9 @@ class VideoDisplay(QLabel):
             x_pos = int(w * 0.05)
             y_pos = int(h * 0.1)
             # Draw text with thick black outline for visibility
-            cv2.putText(display_frame, found, (x_pos, y_pos), font, 1.5, (0, 0, 0), 8, cv2.LINE_AA)
+            cv2.putText(display_frame, found, (x_pos, y_pos), font, 1.5, colours.TEXT_OUTLINE_COLOR, 8, cv2.LINE_AA)
             # Draw text in bright yellow for contrast
-            cv2.putText(display_frame, found, (x_pos, y_pos), font, 1.5, (0, 255, 255), 3, cv2.LINE_AA)
+            cv2.putText(display_frame, found, (x_pos, y_pos), font, 1.5, colours.HIGHLIGHT_TEXT_COLOR, 3, cv2.LINE_AA)
             
         # Convert BGR to RGB format
         rgb_frame = cv2.cvtColor(display_frame, cv2.COLOR_BGR2RGB)

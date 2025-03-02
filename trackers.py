@@ -4,6 +4,7 @@
 import cv2
 import rects
 import utils
+import colours
 from face_detection import Face, DNNFaceDetector, HaarFaceDetector
 
 
@@ -204,9 +205,9 @@ class FaceTracker:
         y_pos = int(h * 0.10)  # 10% from the top edge (moved downward)
         
         # Draw outline for better visibility against any background
-        cv2.putText(image, found, (x_pos, y_pos), font, 0.8, (0, 0, 0), 3, cv2.LINE_AA)
+        cv2.putText(image, found, (x_pos, y_pos), font, 0.8, colours.TEXT_OUTLINE_COLOR, 3, cv2.LINE_AA)
         # Draw text in white
-        cv2.putText(image, found, (x_pos, y_pos), font, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(image, found, (x_pos, y_pos), font, 0.8, colours.TEXT_COLOR, 1, cv2.LINE_AA)
 
     def draw_debug_rects(self, image):
         """Draw rectangles around the tracked facial features."""
@@ -217,11 +218,11 @@ class FaceTracker:
             nose_colour = 255
             mouth_colour = 255
         else:
-            face_colour = (255, 255, 255) # white
-            left_eye_colour = (0, 0, 255) # red
-            right_eye_colour = (0, 255, 255) # yellow
-            nose_colour = (0, 255, 0) # green
-            mouth_colour = (255, 0, 0) # blue
+            face_colour = colours.FACE_COLOR
+            left_eye_colour = colours.LEFT_EYE_COLOR
+            right_eye_colour = colours.RIGHT_EYE_COLOR
+            nose_colour = colours.NOSE_COLOR
+            mouth_colour = colours.MOUTH_COLOR
 
         # Draw with thicker borders for better visibility
         for face in self.faces:
