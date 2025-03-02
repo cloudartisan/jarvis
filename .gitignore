@@ -2,3 +2,6 @@ env
 training/data/
 *.pyc
 screenshot.png
+screencast.avi
+# Don't include downloaded model files
+models/

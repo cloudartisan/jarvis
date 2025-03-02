@@ -48,6 +48,10 @@ class WebcamVideoStream:
             return numpy.fliplr(self._frame).copy()
         else:
             return self._frame
+            
+    def get(self, propId):
+        """Get a property from the underlying VideoCapture object."""
+        return self._stream.get(propId)
 
     def start(self):
         t = Thread(target=self.update, args=())

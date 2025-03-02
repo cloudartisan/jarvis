@@ -358,9 +358,58 @@ class TkinterWindowManager(WindowManager):
         self.panel = None
         self.root.wm_title(self._window_name)
         self.root.wm_protocol('WM_DELETE_WINDOW', self.destroy_window)
+        
+        # Make frame responsive
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
+        
+        # Create frame container that will resize
+        self.container = tk.Frame(self.root)
+        self.container.grid(row=0, column=0, sticky="nsew")
+        
+        self._original_width = 0
+        self._original_height = 0
+        
+        # Bind window resize event
+        self.root.bind("<Configure>", self._on_window_resize)
+        
         self._is_window_created = True
 
+    def _on_window_resize(self, event):
+        # Only process window events, not widget events
+        if event.widget == self.root:
+            width = event.width
+            height = event.height
+            logging.debug(f"Window resized to {width}x{height}")
+    
     def show(self, frame):
+        # Save original frame dimensions on first run
+        if self._original_width == 0:
+            self._original_width = frame.shape[1]
+            self._original_height = frame.shape[0]
+            
+        # Get current window dimensions
+        window_width = self.root.winfo_width()
+        window_height = self.root.winfo_height()
+        
+        # Only resize if window has been properly initialized
+        if window_width > 100 and window_height > 100:
+            # Calculate new dimensions while preserving aspect ratio
+            display_width = window_width - 20  # Adjust for padding
+            display_height = window_height - 20  # Adjust for padding
+            
+            # Determine scaling factor based on both dimensions
+            width_ratio = display_width / self._original_width
+            height_ratio = display_height / self._original_height
+            scale_factor = min(width_ratio, height_ratio)
+            
+            # Calculate new dimensions
+            new_width = int(self._original_width * scale_factor)
+            new_height = int(self._original_height * scale_factor)
+            
+            # Resize the frame
+            frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_AREA)
+        
         # OpenCV represents images in BGR order; however PIL
         # represents images in RGB order, so we need to swap
         # the channels, then convert to PIL and ImageTk format
@@ -370,11 +419,11 @@ class TkinterWindowManager(WindowManager):
 
         # if the panel is not None, we need to initialize it
         if self.panel is None:
-            self.panel = tk.Label(image=image)
+            self.panel = tk.Label(self.container, image=image)
             self.panel.image = image
             self.panel.bind('<KeyRelease>', self._on_key_release_repeat)
             self.panel.bind('<KeyPress>', self._on_key_press_repeat)
-            self.panel.pack(side='left', padx=10, pady=10)
+            self.panel.pack(fill=tk.BOTH, expand=True)
             self.panel.focus_set()
         # otherwise, simply update the panel
         else:
