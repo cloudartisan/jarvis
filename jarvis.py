@@ -8,10 +8,9 @@ import cv2
 
 import filters
 import rects
-from managers import ThreadedCaptureManager
 from video_ui import PyQtWindowManager
 from face_detector import FaceDetector
-from streams import DummyStream, WebcamVideoStream, ThreadedWebStream
+from streams import DummyStream, WebcamVideoStream, ThreadedWebStream, MediaRecorder
 from face_detection import Face
 
 
@@ -26,8 +25,7 @@ class Jarvis(object):
         self.window_manager = PyQtWindowManager('Jarvis - Computer Vision', self.on_key_press)
         self.window_manager.filterChanged.connect(self.on_filter_changed)
         self.window_manager.showFilteredChanged.connect(self.on_show_filtered_changed)
-        self.capture_manager = ThreadedCaptureManager(self.raw_camera_stream,
-                False, None, False)
+        self.media_recorder = MediaRecorder(self.raw_camera_stream)
         
         # Initialize filters
         self.current_filter = None
@@ -46,8 +44,8 @@ class Jarvis(object):
         logging.info("Starting processed web stream {}".format(
             self.processed_web_stream))
         self.processed_web_stream.start()
-        logging.info('Starting capture manager')
-        self.capture_manager.start()
+        logging.info('Starting media recorder')
+        self.media_recorder.start()
 
     def run(self):
         """Run the main loop."""
@@ -284,9 +282,9 @@ class Jarvis(object):
         logging.info('Stopping processed web stream')
         self.processed_web_stream.stop()
         self.processed_web_stream.join()
-        # Stop the capture manager
-        logging.info('Stopping capture manager')
-        self.capture_manager.stop()
+        # Stop the media recorder
+        logging.info('Stopping media recorder')
+        self.media_recorder.stop()
         # Stop the raw camera stream feed
         logging.info('Stopping raw camera stream')
         self.raw_camera_stream.stop()
@@ -295,13 +293,13 @@ class Jarvis(object):
         self.processed_camera_stream.stop()
 
     def screenshot(self):
-        self.capture_manager.write_image('screenshot.png')
+        self.media_recorder.write_image('screenshot.png')
 
     def toggle_record_video(self):
-        if not self.capture_manager.is_writing_video:
-            self.capture_manager.start_writing_video('screencast.avi')
+        if not self.media_recorder.is_writing_video:
+            self.media_recorder.start_writing_video('screencast.avi')
         else:
-            self.capture_manager.stop_writing_video()
+            self.media_recorder.stop_writing_video()
 
     def toggle_show_detection(self):
         """Toggle debug display and update UI state."""
