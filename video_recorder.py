@@ -162,7 +162,3 @@ class VideoRecorder(Thread):
                 fps, size)
 
         self._video_writer.write(frame)
-
-
-# Note: The MediaRecorder compatibility class has been removed
-# All code should now use VideoRecorder directly

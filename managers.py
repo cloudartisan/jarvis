@@ -15,7 +15,7 @@ import warnings
 
 # Show deprecation warning
 warnings.warn(
-    "The managers module is deprecated and empty. Please use media_recorder.VideoRecorder, "
+    "The managers module is deprecated and empty. Please use video_recorder.VideoRecorder, "
     "video_ui.PyQtWindowManager, and streams.ThreadedWebStream instead.",
     DeprecationWarning, stacklevel=2
 )

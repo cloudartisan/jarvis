@@ -82,13 +82,13 @@ Note: The test script uses Google's Speech-to-Text API and requires credentials.
 ## Web Streaming
 
 The main application (jarvis.py) provides two web streams:
-- Raw camera feed: http://localhost:8000/
-- Processed video feed: http://localhost:8888/
+- Raw camera feed: http://localhost:8000/ - Shows the original camera feed without any processing
+- Processed video feed: http://localhost:8888/ - Displays the feed with applied filters and face detection annotations (when debug mode is enabled)
 
 When running the separate web streaming script (scripts/web_serve_stream.py):
 - Camera feed: http://localhost:8080/cam.mjpg
 
-You can view these streams in any web browser or embed them in other applications.
+You can view these streams in any web browser or embed them in other applications. This dual-stream approach allows you to compare the original and processed videos side-by-side by opening both streams in separate browser windows.
 
 ## Controls
 
@@ -165,10 +165,10 @@ The application features a control panel with:
 ## Project Structure
 
 - `jarvis.py` - Main application file
-- `managers.py` - Capture and streaming management
 - `video_ui.py` - PyQt5 UI components and window management
 - `face_detector.py` - Face and feature detection and tracking
-- `streams.py` - Video stream abstractions
+- `streams.py` - Video stream abstractions and web streaming
+- `video_recorder.py` - Video recording and screenshot functionality
 - `utils.py` - Helper functions
 - `rects.py` - Rectangle handling functions
 - `colours.py` - Colour constants for visual elements
@@ -180,6 +180,7 @@ The application features a control panel with:
   - `face_recognition.py` - Face feature recognition
 - `cascades/` - OpenCV face detection XML files
 - `scripts/` - Utility scripts for face detection, web streaming, and speech transcription
+- `managers.py` - Deprecated module (functionality moved to other modules)
 
 ## Using the Image Filters
 

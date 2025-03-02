@@ -11,7 +11,7 @@ import rects
 from video_ui import PyQtWindowManager
 from face_detector import FaceDetector
 from streams import DummyStream, WebcamVideoStream, ThreadedWebStream
-from media_recorder import VideoRecorder
+from video_recorder import VideoRecorder
 from face_detection import Face
 
 
